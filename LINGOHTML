@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lingo — 12 языков | 300 уровней | Алфавит каждого языка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef5e9 0%, #ddecd3 100%);
+            min-height: 100vh;
+            padding: 0.8rem;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-card h2 { font-size: 1.8rem; background: linear-gradient(135deg, #1e3c2c, #3b7b4b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .modal-card input { width: 100%; padding: 0.8rem; margin: 0.6rem 0; border: 2px solid #e2dacf; border-radius: 2rem; font-size: 1rem; outline: none; }
+        .modal-card input:focus { border-color: #3b8b4e; }
+        .modal-btn { background: #3b8b4e; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 2rem; font-weight: bold; cursor: pointer; margin: 0.5rem; width: calc(50% - 1rem); }
+        .modal-btn.secondary { background: #ffb347; }
+        .error-msg { color: #e74c3c; font-size: 0.8rem; }
+
+        .alphabet-modal { max-width: 850px; width: 95%; max-height: 85vh; overflow-y: auto; }
+        .alphabet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.7rem; margin-top: 1rem; }
+        .alphabet-card { background: #f9f7f3; border-radius: 1rem; padding: 0.7rem; text-align: center; border: 1px solid #e2dacf; }
+        .alphabet-letter { font-size: 2rem; font-weight: 700; }
+        .alphabet-pron { font-size: 0.8rem; color: #666; font-family: monospace; }
+        .alphabet-example { font-size: 0.7rem; color: #3b8b4e; margin-top: 0.2rem; }
+
+        .onboarding-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 900;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .onboarding-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.6rem; margin: 1rem 0; }
+        .lang-option { background: #f0f0f0; border: 2px solid #ddd; padding: 0.6rem; border-radius: 1rem; cursor: pointer; text-align: center; font-weight: 500; }
+        .lang-option.selected { background: #3b8b4e; border-color: #2f6e3f; color: white; }
+        .level-option { background: #f9f7f3; border: 2px solid #e2dacf; padding: 0.8rem; border-radius: 1.5rem; cursor: pointer; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 1rem; }
+        .level-option.selected { background: #e0f0e3; border-color: #3b8b4e; }
+        .start-btn { background: #ffb347; border: none; padding: 0.8rem; border-radius: 2rem; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 1rem; }
+
+        .main-interface { display: none; }
+        .header { background: rgba(255,255,248,0.97); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 0.5rem 1.2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: sticky; top: 0; z-index: 30; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; }
+        .logo-icon { font-size: 1.6rem; background: #1e3c2c; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 30px; color: #ffd966; }
+        .logo h1 { font-size: 1.3rem; background: linear-gradient(135deg, #1e3c2c, #3b7b4b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .stats { display: flex; gap: 0.8rem; background: #fef9e6; padding: 0.3rem 1rem; border-radius: 50px; }
+        .stat { display: flex; align-items: center; gap: 0.3rem; font-weight: 600; color: #2c5a2e; font-size: 0.8rem; }
+        .user-info { display: flex; align-items: center; gap: 0.8rem; }
+        .user-name { background: #3b8b4e; color: white; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem; }
+        .alphabet-btn { background: #6c5ce7; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.75rem; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.7rem; }
+
+        .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 1rem; }
+        .levels-panel { background: rgba(255,255,250,0.94); border-radius: 1.5rem; padding: 1rem; height: 70vh; display: flex; flex-direction: column; }
+        .level-list-scroll { flex: 1; overflow-y: auto; }
+        .level-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 0.5rem; }
+        .level-btn { background: white; border: 1px solid #e2d9ca; padding: 0.4rem 0.2rem; border-radius: 1rem; text-align: center; font-weight: 600; font-size: 0.7rem; cursor: pointer; }
+        .level-btn.active { background: #3b8b4e; color: white; transform: scale(1.02); }
+        .level-btn.completed { background: #c8e6d9; color: #1a472a; border-color: #7fae7a; }
+        .level-btn.locked { opacity: 0.5; cursor: not-allowed; background: #ede7db; }
+
+        .lesson-area { background: white; border-radius: 1.5rem; padding: 1.2rem; }
+        .lesson-header { border-bottom: 2px solid #e9e0d2; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .level-description { background: #eef3ea; border-radius: 1rem; padding: 0.6rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; border-left: 4px solid #3b8b4e; }
+        .question-card { background: #fefcf7; border-radius: 1.3rem; padding: 1.2rem; margin: 0.6rem 0; text-align: center; }
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #2c3e2b; }
+        .options { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin: 0.8rem 0; }
+        .option-btn { background: white; border: 2px solid #e2dacf; padding: 0.5rem 1.2rem; border-radius: 2rem; font-size: 0.85rem; cursor: pointer; }
+        .option-btn:hover:not(:disabled) { background: #eef3e6; border-color: #93ba7c; }
+        .voice-btn { background: #6c5ce7; color: white; border: none; padding: 0.7rem 1.2rem; border-radius: 2rem; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .voice-btn.listening { background: #e74c3c; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .feedback { margin-top: 0.6rem; padding: 0.5rem; border-radius: 1rem; }
+        .next-btn { background: #ffb347; border: none; padding: 0.5rem 1.5rem; font-weight: bold; border-radius: 2rem; cursor: pointer; margin-top: 0.5rem; }
+        .congrats { background: #d9f0dd; border-radius: 1rem; padding: 0.8rem; text-align: center; margin: 0.6rem 0; font-weight: 600; }
+
+        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } .question-text { font-size: 1.1rem; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div id="authModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-card">
+            <div class="logo-icon" style="margin: 0 auto 0.5rem; width: 50px; height: 50px; font-size: 1.5rem;">🦜</div>
+            <h2>Lingo</h2>
+            <p>Войдите или зарегистрируйтесь</p>
+            <input type="text" id="authUsername" placeholder="Имя пользователя" autocomplete="off">
+            <input type="password" id="authPassword" placeholder="Пароль">
+            <div id="authError" class="error-msg"></div>
+            <div><button id="loginBtn" class="modal-btn">Войти</button><button id="registerBtn" class="modal-btn secondary">Регистрация</button></div>
+        </div>
+    </div>
+
+    <div id="alphabetModal" class="modal-overlay" style="display: none; z-index: 1100;">
+        <div class="modal-card alphabet-modal">
+            <h2>🔤 Алфавит</h2>
+            <p id="alphabetLangName" style="font-weight: bold;"></p>
+            <div id="alphabetContent" class="alphabet-grid"></div>
+            <button id="closeAlphabetBtn" class="modal-btn secondary" style="width: auto; margin-top: 1rem;">Закрыть</button>
+        </div>
+    </div>
+
+    <div id="onboardingOverlay" class="onboarding-overlay">
+        <div class="onboarding-card">
+            <div class="logo-icon" style="margin: 0 auto 0.5rem; width: 50px; height: 50px; font-size: 1.5rem;">🦜</div>
+            <h2>Выберите язык и уровень</h2>
+            <div class="lang-grid" id="languageGrid"></div>
+            <div id="levelSelectBlock">
+                <div data-level="beginner" class="level-option"><div style="font-size:1.5rem;">🌱</div><div><h4>Я не знаю этот язык</h4><p>Начинаю с нуля, алфавит и основы</p></div></div>
+                <div data-level="intermediate" class="level-option"><div style="font-size:1.5rem;">📚</div><div><h4>Я чуть-чуть знаю</h4><p>Базовые слова и фразы, нужна практика</p></div></div>
+                <div data-level="advanced" class="level-option"><div style="font-size:1.5rem;">🎓</div><div><h4>Я знаю язык</h4><p>Хороший уровень, хочу прокачаться</p></div></div>
+            </div>
+            <button id="confirmLanguageBtn" class="start-btn">🚀 Начать обучение</button>
+        </div>
+    </div>
+
+    <div id="mainInterface" class="main-interface">
+        <div class="header">
+            <div class="logo"><div class="logo-icon">🦜</div><h1>Lingo <span id="currentLangDisplay">English</span></h1></div>
+            <div class="stats"><div class="stat">🏆 <span id="totalScore">0</span> XP</div><div class="stat">📘 <span id="completedLevelsCount">0</span>/300</div><div class="stat">🔥 <span id="streakDay">1</span></div></div>
+            <div class="user-info"><button id="alphabetButton" class="alphabet-btn">🔤 Алфавит</button><span class="user-name" id="userNameDisplay"></span><button id="logoutMainBtn" class="logout-btn">🚪 Выйти</button></div>
+        </div>
+        <div class="main-grid">
+            <aside class="levels-panel"><h3>🗺️ 300 уровней</h3><div class="level-list-scroll"><div id="levelListContainer" class="level-list"></div></div><button id="resetProgressBtn" style="margin-top:0.5rem; background:#f1e7db; border:none; padding:0.3rem; border-radius:1.5rem; cursor:pointer;">🔄 Сбросить прогресс языка</button><button id="changeLanguageBtn" style="margin-top:0.5rem; background:#e8dfd0; border:none; padding:0.3rem; border-radius:1.5rem; cursor:pointer;">🌍 Сменить язык</button></aside>
+            <main class="lesson-area"><div class="lesson-header"><h2 id="levelTitle">Уровень 1</h2><div id="questionProgress">Вопрос 1/5</div></div><div id="levelDescriptionBlock" class="level-description"></div><div id="dynamicContent"></div></main>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ====================== 12 ЯЗЫКОВ С ПОЛНЫМИ АЛФАВИТАМИ ======================
+    const fullAlphabets = {
+        english: { name: "English", letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(l=> ({letter:l, pronunciation: l==='A'?'эй':l==='B'?'би':l==='C'?'си':l==='D'?'ди':l==='E'?'и':l==='F'?'эф':l==='G'?'джи':l==='H'?'эйч':l==='I'?'ай':l==='J'?'джей':l==='K'?'кей':l==='L'?'эл':l==='M'?'эм':l==='N'?'эн':l==='O'?'оу':l==='P'?'пи':l==='Q'?'кью':l==='R'?'ар':l==='S'?'эс':l==='T'?'ти':l==='U'?'ю':l==='V'?'ви':l==='W'?'дабл-ю':l==='X'?'экс':l==='Y'?'уай':'зед', example: l==='A'?'Apple':l==='B'?'Boy':l==='C'?'Cat':l==='D'?'Dog':l==='E'?'Egg':l==='F'?'Fish':l==='G'?'Go':l==='H'?'Hat':l==='I'?'Ice':l==='J'?'Jump':l==='K'?'Kite':l==='L'?'Love':l==='M'?'Mom':l==='N'?'No':l==='O'?'Orange':l==='P'?'Pen':l==='Q'?'Queen':l==='R'?'Red':l==='S'?'Sun':l==='T'?'Top':l==='U'?'Up':l==='V'?'Van':l==='W'?'Water':l==='X'?'X-ray':l==='Y'?'Yes':'Zoo'})) },
+        spanish: { name: "Español", letters: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split('').map(l=> ({letter:l, pronunciation: l==='A'?'а':l==='B'?'бэ':l==='C'?'сэ':l==='D'?'дэ':l==='E'?'э':l==='F'?'эфэ':l==='G'?'хэ':l==='H'?'аче':l==='I'?'и':l==='J'?'хота':l==='K'?'ка':l==='L'?'эле':l==='M'?'эме':l==='N'?'эне':l==='Ñ'?'энье':l==='O'?'о':l==='P'?'пэ':l==='Q'?'ку':l==='R'?'эрэ':l==='S'?'эсе':l==='T'?'тэ':l==='U'?'у':l==='V'?'увэ':l==='W'?'увэ добле':l==='X'?'экис':l==='Y'?'и грьега':l==='Z'?'сэта':'зе', example: l==='A'?'Amigo':l==='B'?'Bueno':l==='C'?'Casa':l==='D'?'Día':l==='E'?'Estrella':l==='F'?'Flor':l==='G'?'Gato':l==='H'?'Hola':l==='I'?'Iglesia':l==='J'?'Jugar':l==='K'?'Kilo':l==='L'?'Luz':l==='M'?'Madre':l==='N'?'Noche':l==='Ñ'?'Niño':l==='O'?'Oro':l==='P'?'Padre':l==='Q'?'Queso':l==='R'?'Rojo':l==='S'?'Sol':l==='T'?'Tiempo':l==='U'?'Uno':l==='V'?'Vida':l==='W'?'Wifi':l==='X'?'Xilófono':l==='Y'?'Yo':'Zapato'})) },
+        french: { name: "Français", letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(l=> ({letter:l, pronunciation: l==='A'?'а':l==='B'?'бэ':l==='C'?'сэ':l==='D'?'дэ':l==='E'?'ё':l==='F'?'эф':l==='G'?'жэ':l==='H'?'аш':l==='I'?'и':l==='J'?'жи':l==='K'?'ка':l==='L'?'эль':l==='M'?'эм':l==='N'?'эн':l==='O'?'о':l==='P'?'пэ':l==='Q'?'кю':l==='R'?'эр':l==='S'?'эс':l==='T'?'тэ':l==='U'?'ю':l==='V'?'вэ':l==='W'?'дубль вэ':l==='X'?'икс':l==='Y'?'игрек':'зэд', example: l==='A'?'Ami':l==='B'?'Bonjour':l==='C'?'Chien':l==='D'?'Dieu':l==='E'?'Eau':l==='F'?'France':l==='G'?'Gâteau':l==='H'?'Homme':l==='I'?'Île':l==='J'?'Jour':l==='K'?'Kilo':l==='L'?'Lune':l==='M'?'Mer':l==='N'?'Nuit':l==='O'?'Oiseau':l==='P'?'Pain':l==='Q'?'Quatre':l==='R'?'Rouge':l==='S'?'Soleil':l==='T'?'Terre':l==='U'?'Univers':l==='V'?'Vie':l==='W'?'Week-end':l==='X'?'Xylophone':l==='Y'?'Yoga':'Zèbre'})) },
+        german: { name: "Deutsch", letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß".split('').map(l=> ({letter:l, pronunciation: l==='A'?'а':l==='B'?'бэ':l==='C'?'цэ':l==='D'?'дэ':l==='E'?'э':l==='F'?'эф':l==='G'?'гэ':l==='H'?'ха':l==='I'?'и':l==='J'?'йот':l==='K'?'ка':l==='L'?'эль':l==='M'?'эм':l==='N'?'эн':l==='O'?'о':l==='P'?'пэ':l==='Q'?'ку':l==='R'?'эр':l==='S'?'эс':l==='T'?'тэ':l==='U'?'у':l==='V'?'фау':l==='W'?'вэ':l==='X'?'икс':l==='Y'?'юпсилон':l==='Z'?'цет':l==='Ä'?'э-умлаут':l==='Ö'?'о-умлаут':l==='Ü'?'у-умлаут':'эсцет', example: l==='A'?'Apfel':l==='B'?'Brot':l==='C'?'Computer':l==='D'?'Danke':l==='E'?'Essen':l==='F'?'Fisch':l==='G'?'Gut':l==='H'?'Hallo':l==='I'?'Ich':l==='J'?'Ja':l==='K'?'Kind':l==='L'?'Liebe':l==='M'?'Mutter':l==='N'?'Nein':l==='O'?'Ort':l==='P'?'Papier':l==='Q'?'Quelle':l==='R'?'Rot':l==='S'?'Sonne':l==='T'?'Tag':l==='U'?'Uhr':l==='V'?'Vater':l==='W'?'Wasser':l==='X'?'Xylofon':l==='Y'?'Yacht':l==='Z'?'Zeit':l==='Ä'?'Äpfel':l==='Ö'?'Öl':l==='Ü'?'Übung':'Straße'})) },
+        italian: { name: "Italiano", letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(l=> ({letter:l, pronunciation: l==='A'?'а':l==='B'?'би':l==='C'?'чи':l==='D'?'ди':l==='E'?'э':l==='F'?'эффе':l==='G'?'джи':l==='H'?'акка':l==='I'?'и':l==='J'?'и лунга':l==='K'?'каппа':l==='L'?'элле':l==='M'?'эмме':l==='N'?'энне':l==='O'?'о':l==='P'?'пи':l==='Q'?'ку':l==='R'?'эрре':l==='S'?'эссе':l==='T'?'ти':l==='U'?'у':l==='V'?'ву':l==='W'?'доппиа ву':l==='X'?'икс':l==='Y'?'ипсилон':'дзета', example: l==='A'?'Amore':l==='B'?'Bella':l==='C'?'Ciao':l==='D'?'Dove':l==='E'?'Elefante':l==='F'?'Festa':l==='G'?'Gatto':l==='H'?'Hotel':l==='I'?'Italia':l==='J'?'Jazz':l==='K'?'Karaoke':l==='L'?'Luna':l==='M'?'Mare':l==='N'?'Notte':l==='O'?'Occhio':l==='P'?'Pizza':l==='Q'?'Quadro':l==='R'?'Roma':l==='S'?'Sole':l==='T'?'Tavolo':l==='U'?'Uccello':l==='V'?'Vino':l==='W'?'Web':l==='X'?'Xilofono':l==='Y'?'Yogurt':'Zebra'})) },
+        russian: { name: "Русский", letters: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".split('').map(l=> ({letter:l, pronunciation: l==='А'?'а':l==='Б'?'бэ':l==='В'?'вэ':l==='Г'?'гэ':l==='Д'?'дэ':l==='Е'?'йэ':l==='Ё'?'йо':l==='Ж'?'жэ':l==='З'?'зэ':l==='И'?'и':l==='Й'?'и краткое':l==='К'?'ка':l==='Л'?'эль':l==='М'?'эм':l==='Н'?'эн':l==='О'?'о':l==='П'?'пэ':l==='Р'?'эр':l==='С'?'эс':l==='Т'?'тэ':l==='У'?'у':l==='Ф'?'эф':l==='Х'?'ха':l==='Ц'?'цэ':l==='Ч'?'чэ':l==='Ш'?'ша':l==='Щ'?'ща':l==='Ъ'?'твёрдый знак':l==='Ы'?'ы':l==='Ь'?'мягкий знак':l==='Э'?'э':l==='Ю'?'ю':'я', example: l==='А'?'Арбуз':l==='Б'?'Белка':l==='В'?'Волк':l==='Г'?'Город':l==='Д'?'Дом':l==='Е'?'Ель':l==='Ё'?'Ёж':l==='Ж'?'Жук':l==='З'?'Зебра':l==='И'?'Игла':l==='Й'?'Йогурт':l==='К'?'Кот':l==='Л'?'Лес':l==='М'?'Мама':l==='Н'?'Нос':l==='О'?'Окно':l==='П'?'Пес':l==='Р'?'Рыба':l==='С'?'Солнце':l==='Т'?'Тигр':l==='У'?'Утка':l==='Ф'?'Флаг':l==='Х'?'Хлеб':l==='Ц'?'Цвет':l==='Ч'?'Чай':l==='Ш'?'Шар':l==='Щ'?'Щука':l==='Ъ'?'Объезд':l==='Ы'?'Мышь':l==='Ь'?'Лось':l==='Э'?'Эхо':l==='Ю'?'Юг':'Яблоко'})) },
+        portuguese: { name: "Português", letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(l=> ({letter:l, pronunciation: l.toLowerCase()+'ê', example: l==='A'?'Amor':l==='B'?'Brasil':l==='C'?'Casa':l==='D'?'Dia':l==='E'?'Escola':l==='F'?'Fogo':l==='G'?'Gato':l==='H'?'Homem':l==='I'?'Ilha':l==='J'?'Jogo':l==='K'?'Kilo':l==='L'?'Lua':l==='M'?'Mãe':l==='N'?'Noite':l==='O'?'Ouro':l==='P'?'Pão':l==='Q'?'Quente':l==='R'?'Rio':l==='S'?'Sol':l==='T'?'Terra':l==='U'?'Uva':l==='V'?'Vida':l==='W'?'Web':l==='X'?'Xadrez':l==='Y'?'Yoga':'Zebra'})) },
+        japanese: { name: "日本語 (Хирагана)", letters: [{letter:"あ", pronunciation:"а", example:"あおい (синий)"},{letter:"い", pronunciation:"и", example:"いぬ (собака)"},{letter:"う", pronunciation:"у", example:"うみ (море)"},{letter:"え", pronunciation:"э", example:"えき (станция)"},{letter:"お", pronunciation:"о", example:"おとこ (мужчина)"},{letter:"か", pronunciation:"ка", example:"かみ (бумага)"},{letter:"き", pronunciation:"ки", example:"き (дерево)"},{letter:"く", pronunciation:"ку", example:"くも (облако)"},{letter:"け", pronunciation:"кэ", example:"けしき (пейзаж)"},{letter:"こ", pronunciation:"ко", example:"こども (ребёнок)"},{letter:"さ", pronunciation:"са", example:"さかな (рыба)"},{letter:"し", pronunciation:"си", example:"しろ (белый)"},{letter:"す", pronunciation:"су", example:"すし (суши)"},{letter:"せ", pronunciation:"сэ", example:"せかい (мир)"},{letter:"そ", pronunciation:"со", example:"そら (небо)"},{letter:"た", pronunciation:"та", example:"たべる (есть)"},{letter:"ち", pronunciation:"ти", example:"ちず (карта)"},{letter:"つ", pronunciation:"цу", example:"つき (луна)"},{letter:"て", pronunciation:"тэ", example:"て (рука)"},{letter:"と", pronunciation:"то", example:"とり (птица)"}] },
+        korean: { name: "한국어 (Хангыль)", letters: [{letter:"ㄱ", pronunciation:"гиёк", example:"가구 (мебель)"},{letter:"ㄴ", pronunciation:"ниын", example:"나무 (дерево)"},{letter:"ㄷ", pronunciation:"дигыт", example:"다리 (нога)"},{letter:"ㄹ", pronunciation:"риыль", example:"라면 (рамён)"},{letter:"ㅁ", pronunciation:"миым", example:"마음 (сердце)"},{letter:"ㅂ", pronunciation:"пиып", example:"바다 (море)"},{letter:"ㅅ", pronunciation:"сиот", example:"사람 (человек)"},{letter:"ㅇ", pronunciation:"иын", example:"아이 (ребёнок)"},{letter:"ㅈ", pronunciation:"чиыт", example:"자다 (спать)"},{letter:"ㅊ", pronunciation:"чхиыт", example:"차 (чай)"},{letter:"ㅋ", pronunciation:"кхиык", example:"코 (нос)"},{letter:"ㅌ", pronunciation:"тхиыт", example:"토마토 (помидор)"},{letter:"ㅍ", pronunciation:"пхиып", example:"파 (зелёный лук)"},{letter:"ㅎ", pronunciation:"хиыт", example:"하나 (один)"}] },
+        chinese: { name: "中文 (Пиньинь)", letters: [{letter:"a", pronunciation:"а", example:"ā (звук)"},{letter:"o", pronunciation:"о", example:"wǒ (я)"},{letter:"e", pronunciation:"э", example:"hē (пить)"},{letter:"i", pronunciation:"и", example:"nǐ (ты)"},{letter:"u", pronunciation:"у", example:"bù (нет)"},{letter:"ü", pronunciation:"ю", example:"nǚ (женщина)"},{letter:"b", pronunciation:"б", example:"bàba (папа)"},{letter:"p", pronunciation:"п", example:"píngguǒ (яблоко)"},{letter:"m", pronunciation:"м", example:"māma (мама)"},{letter:"f", pronunciation:"ф", example:"fēijī (самолёт)"},{letter:"d", pronunciation:"д", example:"dà (большой)"},{letter:"t", pronunciation:"т", example:"tiān (небо)"},{letter:"n", pronunciation:"н", example:"nǐ (ты)"},{letter:"l", pronunciation:"л", example:"lǎo (старый)"},{letter:"g", pronunciation:"г", example:"gǒu (собака)"},{letter:"k", pronunciation:"к", example:"kāi (открыть)"},{letter:"h", pronunciation:"х", example:"hǎo (хорошо)"}] },
+        arabic: { name: "العربية", letters: [{letter:"ا", pronunciation:"алиф", example:"أب (отец)"},{letter:"ب", pronunciation:"ба", example:"بيت (дом)"},{letter:"ت", pronunciation:"та", example:"تفاح (яблоко)"},{letter:"ث", pronunciation:"са", example:"ثلج (снег)"},{letter:"ج", pronunciation:"джим", example:"جمل (верблюд)"},{letter:"ح", pronunciation:"ха", example:"حب (любовь)"},{letter:"خ", pronunciation:"ха (гортанная)", example:"خبز (хлеб)"},{letter:"د", pronunciation:"даль", example:"ديك (петух)"},{letter:"ذ", pronunciation:"заль", example:"ذهب (золото)"},{letter:"ر", pronunciation:"ра", example:"رجل (мужчина)"},{letter:"ز", pronunciation:"зайн", example:"زهرة (цветок)"},{letter:"س", pronunciation:"син", example:"سمك (рыба)"},{letter:"ش", pronunciation:"шин", example:"شمس (солнце)"},{letter:"ص", pronunciation:"сад", example:"صديق (друг)"},{letter:"ض", pronunciation:"дад", example:"ضيف (гость)"}] },
+        hindi: { name: "हिन्दी (Деванагари)", letters: [{letter:"अ", pronunciation:"а", example:"अमर (бессмертный)"},{letter:"आ", pronunciation:"аа", example:"आम (манго)"},{letter:"इ", pronunciation:"и", example:"इमली (тамаринд)"},{letter:"ई", pronunciation:"ии", example:"ईख (сахарный тростник)"},{letter:"उ", pronunciation:"у", example:"उल्लू (сова)"},{letter:"ऊ", pronunciation:"уу", example:"ऊन (шерсть)"},{letter:"ए", pronunciation:"э", example:"एक (один)"},{letter:"ऐ", pronunciation:"ай", example:"ऐनक (очки)"},{letter:"ओ", pronunciation:"о", example:"ओस (роса)"},{letter:"औ", pronunciation:"ау", example:"औरत (женщина)"},{letter:"क", pronunciation:"ка", example:"कमरा (комната)"},{letter:"ख", pronunciation:"кха", example:"खाना (еда)"},{letter:"ग", pronunciation:"га", example:"गाना (песня)"},{letter:"घ", pronunciation:"гха", example:"घर (дом)"},{letter:"च", pronunciation:"ча", example:"चाय (чай)"},{letter:"छ", pronunciation:"чха", example:"छत (крыша)"},{letter:"ज", pronunciation:"джа", example:"जल (вода)"},{letter:"झ", pronunciation:"джха", example:"झंडा (флаг)"},{letter:"ट", pronunciation:"та", example:"टमाटर (помидор)"},{letter:"ठ", pronunciation:"тха", example:"ठंड (холод)"}] }
+    };
+
+    const languagesList = [
+        { code: "english", name: "English", flag: "🇬🇧", greeting: "Hello", helloText: "Hello! How are you?" },
+        { code: "spanish", name: "Español", flag: "🇪🇸", greeting: "Hola", helloText: "¡Hola! ¿Cómo estás?" },
+        { code: "french", name: "Français", flag: "🇫🇷", greeting: "Bonjour", helloText: "Bonjour ! Comment allez-vous ?" },
+        { code: "german", name: "Deutsch", flag: "🇩🇪", greeting: "Hallo", helloText: "Hallo! Wie geht es dir?" },
+        { code: "italian", name: "Italiano", flag: "🇮🇹", greeting: "Ciao", helloText: "Ciao! Come stai?" },
+        { code: "portuguese", name: "Português", flag: "🇵🇹", greeting: "Olá", helloText: "Olá! Como você está?" },
+        { code: "russian", name: "Русский", flag: "🇷🇺", greeting: "Здравствуйте", helloText: "Здравствуйте! Как дела?" },
+        { code: "chinese", name: "中文", flag: "🇨🇳", greeting: "Nǐ hǎo", helloText: "Nǐ hǎo! Nǐ hǎo ma?" },
+        { code: "japanese", name: "日本語", flag: "🇯🇵", greeting: "Konnichiwa", helloText: "Konnichiwa! Ogenki desu ka?" },
+        { code: "korean", name: "한국어", flag: "🇰🇷", greeting: "Annyeong", helloText: "Annyeonghaseyo! Jal jinaeseyo?" },
+        { code: "arabic", name: "العربية", flag: "🇸🇦", greeting: "Marhaba", helloText: "Marhaba! Kayfa halak?" },
+        { code: "hindi", name: "हिन्दी", flag: "🇮🇳", greeting: "Namaste", helloText: "Namaste! Aap kaise hain?" }
+    ];
+
+    let currentUser = null;
+    let usersDB = {};
+
+    function loadUsersDB() { const saved = localStorage.getItem("lingo_users_db"); if(saved) usersDB = JSON.parse(saved); else usersDB = {}; }
+    function saveUsersDB() { localStorage.setItem("lingo_users_db", JSON.stringify(usersDB)); }
+
+    function generateQuestionsForLevel(levelId, languageCode, skillLevel) {
+        const lang = languagesList.find(l => l.code === languageCode);
+        const isAdvanced = skillLevel === 'advanced';
+        const topics = ["Приветствия","Семья","Еда","Цвета","Животные","Числа","Время","Погода","Путешествия","Работа","Школа","Спорт","Искусство","Технологии","Природа"];
+        const topic = topics[levelId % topics.length];
+        return [
+            { type: 'translate', question: `Как перевести фразу "${lang.helloText}" на русский?`, options: ["Привет! Как дела?", "До свидания!", "Спасибо!", "Доброе утро!"], correct: "Привет! Как дела?", explanation: `"${lang.helloText}" — приветствие` },
+            { type: 'translate', question: `Как перевести "I love learning" на русский?`, options: ["Я люблю учиться", "Я ненавижу учёбу", "Я учу английский", "Я хочу спать"], correct: "Я люблю учиться", explanation: "I love learning = Я люблю учиться" },
+            { type: 'word', question: `Что означает "${lang.greeting}"?`, options: ["Привет", "Пока", "Спасибо", "Пожалуйста"], correct: "Привет", explanation: `"${lang.greeting}" — приветствие на ${lang.name}` },
+            { type: 'voice', question: `🎤 Произнесите: "${isAdvanced ? `Фраза на ${lang.name}: ${lang.helloText}` : 'I love learning'}"`, targetPhrase: (isAdvanced ? lang.helloText.toLowerCase() : 'i love learning'), explanation: "Потренируйте произношение" },
+            { type: 'translate', question: `Как сказать "Спасибо" на ${lang.name}?`, options: lang.code==='english'?["Thank you","Please","Sorry","Hello"]:lang.code==='spanish'?["Gracias","Por favor","Lo siento","Hola"]:["Спасибо","Пожалуйста","Извините","Привет"], correct: lang.code==='english'?"Thank you":lang.code==='spanish'?"Gracias":"Спасибо", explanation: `Вежливое слово "спасибо" на ${lang.name}` }
+        ];
+    }
+
+    function initUserLevelsForLanguage(user, languageCode, skillLevel) {
+        if(!user.progress[languageCode]) {
+            const levels = [];
+            const topics = ["Приветствия","Семья","Еда","Цвета","Животные","Числа","Время","Погода","Путешествия","Работа","Школа","Спорт","Искусство","Технологии","Природа","Здоровье","Одежда","Транспорт","Развлечения","Праздники"];
+            for(let i=0; i<300; i++) {
+                const topic = topics[i % topics.length];
+                levels.push({
+                    id: i, name: `Уровень ${i+1}: ${topic} ${Math.floor(i/20)+1 > 1 ? `(ч.${Math.floor(i/20)+1})` : ''}`,
+                    description: skillLevel === 'beginner' ? "📖 Базовый уровень: учим простые слова и фразы" : (skillLevel === 'intermediate' ? "📚 Средний уровень: грамматика и диалоги" : "🎓 Продвинутый уровень: сложные конструкции"),
+                    questions: generateQuestionsForLevel(i, languageCode, skillLevel)
+                });
+            }
+            user.progress[languageCode] = { skillLevel, levelsData: levels, completedLevels: [], currentLevel: 0, levelScores: {}, lessonProgress: {}, totalPoints: 0 };
+            user.progress[languageCode].lessonProgress[0] = { qIdx: 0, answers: [false, false, false, false, false] };
+        }
+    }
+
+    function saveCurrentProgress() { if(currentUser && currentUser.activeLanguage) { usersDB[currentUser.username] = currentUser; saveUsersDB(); } }
+    
+    function renderLevelList() {
+        if(!currentUser || !currentUser.activeLanguage) return;
+        const prog = currentUser.progress[currentUser.activeLanguage];
+        if(!prog) return;
+        const container = document.getElementById("levelListContainer");
+        container.innerHTML = "";
+        for(let i=0; i<300; i++) {
+            const unlocked = i===0 || prog.completedLevels.includes(i-1);
+            const completed = prog.completedLevels.includes(i);
+            const btn = document.createElement("button");
+            btn.className = `level-btn ${prog.currentLevel===i?'active':''} ${completed?'completed':''} ${!unlocked && !completed?'locked':''}`;
+            btn.innerHTML = `<div style="font-weight:800;">${i+1}</div><div style="font-size:0.55rem;">${prog.levelsData[i].name.substring(0,12)}</div>${completed?'✓':''}`;
+            if(unlocked || completed) btn.onclick = () => { prog.currentLevel=i; if(!prog.lessonProgress[i]) prog.lessonProgress[i]={qIdx:0,answers:[false,false,false,false,false]}; saveCurrentProgress(); renderLevelList(); renderCurrentLesson(); updateStats(); };
+            container.appendChild(btn);
+        }
+        document.getElementById("completedLevelsCount").innerText = prog.completedLevels.length;
+    }
+
+    function updateStats() {
+        if(!currentUser || !currentUser.activeLanguage) return;
+        const prog = currentUser.progress[currentUser.activeLanguage];
+        if(prog) { document.getElementById("totalScore").innerText = prog.totalPoints; document.getElementById("completedLevelsCount").innerText = prog.completedLevels.length; document.getElementById("streakDay").innerText = Math.min(99, Math.floor(prog.totalPoints/100)+1); }
+    }
+
+    function renderCurrentLesson() {
+        if(!currentUser || !currentUser.activeLanguage) return;
+        const prog = currentUser.progress[currentUser.activeLanguage];
+        const level = prog.levelsData[prog.currentLevel];
+        document.getElementById("levelTitle").innerHTML = `📖 ${level.name}`;
+        document.getElementById("levelDescriptionBlock").innerHTML = level.description;
+        const lesson = prog.lessonProgress[prog.currentLevel];
+        if(!lesson) { prog.lessonProgress[prog.currentLevel]={qIdx:0,answers:[false,false,false,false,false]}; saveCurrentProgress(); renderCurrentLesson(); return; }
+        const qIdx = lesson.qIdx;
+        document.getElementById("questionProgress").innerHTML = `Вопрос ${qIdx+1}/5`;
+        const allDone = lesson.answers.every(v=>v===true);
+        
+        if(allDone && !prog.completedLevels.includes(prog.currentLevel)) {
+            document.getElementById("dynamicContent").innerHTML = `<div class="congrats">🎉 Поздравляю! Уровень пройден! +50 очков 🎉</div><button class="next-btn" id="nextLvlBtn">➡️ Следующий уровень</button>`;
+            document.getElementById("nextLvlBtn")?.addEventListener("click",()=>{
+                if(!prog.completedLevels.includes(prog.currentLevel)){ prog.completedLevels.push(prog.currentLevel); prog.totalPoints+=50; prog.levelScores[prog.currentLevel]=(prog.levelScores[prog.currentLevel]||0)+50; }
+                let nxt=prog.currentLevel+1;
+                if(nxt<300){ prog.currentLevel=nxt; if(!prog.lessonProgress[nxt]) prog.lessonProgress[nxt]={qIdx:0,answers:[false,false,false,false,false]}; saveCurrentProgress(); renderLevelList(); renderCurrentLesson(); }
+                else alert("🏆 ВЫ ПРОШЛИ ВСЕ 300 УРОВНЕЙ! Вы — настоящий полиглот! 🏆");
+                updateStats(); saveCurrentProgress();
+            });
+            return;
+        }
+        
+        if(lesson.answers[qIdx]){ document.getElementById("dynamicContent").innerHTML = `<div class="question-card"><button class="next-btn" id="gotoNext">➡️ Далее</button></div>`; document.getElementById("gotoNext")?.addEventListener("click",()=>goNext()); return; }
+        
+        const q = level.questions[qIdx];
+        if(q.type === 'voice'){
+            const voiceHTML = `<div class="question-card"><div class="question-text">${q.question}</div><button id="voiceRecordBtn" class="voice-btn">🎤 Нажми и произнеси</button><div id="voiceResult" class="feedback"></div><button id="voiceCheckBtn" class="next-btn" style="display:none;">✅ Проверить</button></div>`;
+            document.getElementById("dynamicContent").innerHTML = voiceHTML;
+            const recordBtn = document.getElementById("voiceRecordBtn");
+            const resultDiv = document.getElementById("voiceResult");
+            const checkBtn = document.getElementById("voiceCheckBtn");
+            let recordedText = "";
+            if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                let listening=false;
+                recordBtn.onclick = () => { if(listening) return; listening=true; recordBtn.classList.add("listening"); recordBtn.innerHTML="🎙️ Слушаю..."; recognition.start();
+                recognition.onresult = (event) => { recordedText = event.results[0][0].transcript.toLowerCase().trim(); resultDiv.innerHTML = `🎤 Вы сказали: "${recordedText}"`; resultDiv.style.background="#e8f0fe"; checkBtn.style.display="inline-block"; recordBtn.classList.remove("listening"); recordBtn.innerHTML="🎤 Нажми и произнеси"; listening=false; };
+                recognition.onerror = () => { recordBtn.classList.remove("listening"); recordBtn.innerHTML="🎤 Ошибка"; listening=false; };
+                recognition.onend = () => { if(listening){ recordBtn.classList.remove("listening"); recordBtn.innerHTML="🎤 Нажми и произнеси"; listening=false; } }; };
+                checkBtn.onclick = () => { const target = q.targetPhrase || "i love learning"; if(recordedText.includes(target) || target.includes(recordedText)){ resultDiv.innerHTML = `✅ Отлично! +10 очков`; resultDiv.style.background="#d4f5d4"; lesson.answers[qIdx]=true; prog.totalPoints+=10; saveCurrentProgress(); checkBtn.disabled=true; recordBtn.disabled=true; setTimeout(()=>goNext(),1000); } else { resultDiv.innerHTML = `❌ Попробуйте ещё раз. Нужно: "${target}"`; resultDiv.style.background="#ffe0db"; } updateStats(); };
+            } else { resultDiv.innerHTML = "⚠️ Ваш браузер не поддерживает голосовой ввод"; checkBtn.style.display="inline-block"; checkBtn.onclick = () => { lesson.answers[qIdx]=true; prog.totalPoints+=5; saveCurrentProgress(); goNext(); updateStats(); }; }
+        } else {
+            let optsHtml = `<div class="options">`;
+            q.options.forEach(opt => optsHtml += `<button class="option-btn" data-opt="${opt.replace(/"/g, '&quot;')}">${opt}</button>`);
+            optsHtml += `</div><div id="fbArea" class="feedback"></div><button class="next-btn" id="nextQBtn" style="display:none;">Следующий →</button>`;
+            document.getElementById("dynamicContent").innerHTML = `<div class="question-card"><div class="question-text">${q.question}</div>${optsHtml}</div>`;
+            const btns = document.querySelectorAll(".option-btn");
+            btns.forEach(btn => { btn.onclick = () => { const selected = btn.dataset.opt; const isCorrect = (selected === q.correct); const fb = document.getElementById("fbArea");
+                if(isCorrect){ fb.innerHTML = `✅ Верно! +10 очков. ${q.explanation}`; fb.style.background="#d4f5d4"; lesson.answers[qIdx]=true; prog.totalPoints+=10; saveCurrentProgress(); document.getElementById("nextQBtn").style.display="inline-block"; btns.forEach(b=>b.disabled=true); }
+                else { fb.innerHTML = `❌ Неверно. Правильно: ${q.correct}. ${q.explanation}`; fb.style.background="#ffe0db"; btns.forEach(b=>b.disabled=true); const retry = document.createElement("button"); retry.innerText="🔄 Попробовать снова"; retry.style.marginTop="0.5rem"; retry.style.padding="0.3rem 0.8rem"; retry.style.borderRadius="2rem"; retry.style.border="none"; retry.style.cursor="pointer"; retry.onclick = () => renderCurrentLesson(); fb.appendChild(retry); }
+                updateStats(); }; });
+            document.getElementById("nextQBtn")?.addEventListener("click", () => goNext());
+        }
+    }
+
+    function goNext() {
+        if(!currentUser || !currentUser.activeLanguage) return;
+        const prog = currentUser.progress[currentUser.activeLanguage];
+        const lesson = prog.lessonProgress[prog.currentLevel];
+        if(lesson.qIdx + 1 < 5){ lesson.qIdx++; saveCurrentProgress(); renderCurrentLesson(); }
+        else { if(lesson.answers.every(v=>v===true)){ if(!prog.completedLevels.includes(prog.currentLevel)){ prog.completedLevels.push(prog.currentLevel); prog.totalPoints+=50; } renderCurrentLesson(); } else alert("Ответьте правильно на все вопросы!"); }
+        renderLevelList(); updateStats(); saveCurrentProgress();
+    }
+
+    function showAlphabet() {
+        if(!currentUser || !currentUser.activeLanguage) return;
+        const alphabet = fullAlphabets[currentUser.activeLanguage] || fullAlphabets.english;
+        document.getElementById("alphabetLangName").innerHTML = `${alphabet.name} алфавит`;
+        const container = document.getElementById("alphabetContent");
+        container.innerHTML = "";
+        for(let item of alphabet.letters) {
+            const card = document.createElement("div");
+            card.className = "alphabet-card";
+            card.innerHTML = `<div class="alphabet-letter">${item.letter}</div><div class="alphabet-pron">📢 ${item.pronunciation}</div><div class="alphabet-example">✨ ${item.example}</div>`;
+            container.appendChild(card);
+        }
+        document.getElementById("alphabetModal").style.display = "flex";
+    }
+
+    function changeLanguage(langCode, skillLevel) {
+        if(!currentUser) return;
+        if(!currentUser.progress[langCode]) initUserLevelsForLanguage(currentUser, langCode, skillLevel);
+        else if(skillLevel && currentUser.progress[langCode].skillLevel !== skillLevel) { currentUser.progress[langCode].skillLevel = skillLevel; initUserLevelsForLanguage(currentUser, langCode, skillLevel); }
+        currentUser.activeLanguage = langCode;
+        saveCurrentProgress();
+        const lang = languagesList.find(l=>l.code===langCode);
+        document.getElementById("currentLangDisplay").innerHTML = `${lang.flag} ${lang.name}`;
+        renderLevelList(); renderCurrentLesson(); updateStats();
+    }
+
+    function setupLanguageSelection() {
+        const grid = document.getElementById("languageGrid");
+        grid.innerHTML = "";
+        languagesList.forEach(lang => {
+            const div = document.createElement("div");
+            div.className = "lang-option";
+            div.innerHTML = `${lang.flag} ${lang.name}`;
+            div.onclick = () => { document.querySelectorAll(".lang-option").forEach(l=>l.classList.remove("selected")); div.classList.add("selected"); window.selectedLangCode = lang.code; };
+            grid.appendChild(div);
+        });
+        document.querySelectorAll(".lang-option")[0]?.classList.add("selected");
+        window.selectedLangCode = 'english';
+        document.querySelectorAll(".level-option").forEach(opt => opt.classList.remove("selected"));
+        document.querySelector(".level-option")?.classList.add("selected");
+        window.selectedSkill = 'beginner';
+        document.querySelectorAll(".level-option").forEach(opt => { opt.onclick = () => { document.querySelectorAll(".level-option").forEach(o=>o.classList.remove("selected")); opt.classList.add("selected"); window.selectedSkill = opt.dataset.level; }; });
+    }
+
+    function login(username, password) {
+        if(usersDB[username] && usersDB[username].password === password) {
+            currentUser = usersDB[username];
+            if(!currentUser.progress) currentUser.progress = {};
+            if(!currentUser.activeLanguage) currentUser.activeLanguage = 'english';
+            if(!currentUser.progress[currentUser.activeLanguage]) initUserLevelsForLanguage(currentUser, currentUser.activeLanguage, 'beginner');
+            saveCurrentProgress();
+            document.getElementById("authModal").style.display = "none";
+            document.getElementById("userNameDisplay").innerText = username;
+            setupLanguageSelection();
+            document.getElementById("onboardingOverlay").style.display = "flex";
+            return true;
+        }
+        document.getElementById("authError").innerText = "Неверное имя или пароль";
+        return false;
+    }
+
+    function register(username, password) {
+        if(usersDB[username]) { document.getElementById("authError").innerText = "Пользователь уже существует"; return false; }
+        usersDB[username] = { username, password, progress: {}, activeLanguage: 'english' };
+        saveUsersDB();
+        return login(username, password);
+    }
+
+    document.getElementById("confirmLanguageBtn").onclick = () => { if(window.selectedLangCode && window.selectedSkill) { changeLanguage(window.selectedLangCode, window.selectedSkill); document.getElementById("onboardingOverlay").style.display = "none"; document.getElementById("mainInterface").style.display = "block"; renderLevelList(); renderCurrentLesson(); updateStats(); } };
+    document.getElementById("alphabetButton")?.addEventListener("click", showAlphabet);
+    document.getElementById("closeAlphabetBtn")?.addEventListener("click", () => document.getElementById("alphabetModal").style.display = "none");
+    document.getElementById("resetProgressBtn")?.addEventListener("click",()=>{ if(confirm("Сбросить прогресс?")){ if(currentUser && currentUser.activeLanguage){ const lang=currentUser.activeLanguage, skill=currentUser.progress[lang].skillLevel; initUserLevelsForLanguage(currentUser, lang, skill); saveCurrentProgress(); renderLevelList(); renderCurrentLesson(); updateStats(); } } });
+    document.getElementById("changeLanguageBtn")?.addEventListener("click",()=>{ document.getElementById("onboardingOverlay").style.display="flex"; setupLanguageSelection(); });
+    document.getElementById("logoutMainBtn")?.addEventListener("click",()=>{ currentUser=null; document.getElementById("mainInterface").style.display="none"; document.getElementById("authModal").style.display="flex"; document.getElementById("authUsername").value=""; document.getElementById("authPassword").value=""; });
+    document.getElementById("loginBtn")?.addEventListener("click",()=>{ const u=document.getElementById("authUsername").value.trim(), p=document.getElementById("authPassword").value; if(u&&p) login(u,p); });
+    document.getElementById("registerBtn")?.addEventListener("click",()=>{ const u=document.getElementById("authUsername").value.trim(), p=document.getElementById("authPassword").value; if(u&&p) register(u,p); });
+
+    loadUsersDB();
+</script>
+</body>
+</html>
